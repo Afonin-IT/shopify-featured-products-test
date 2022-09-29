@@ -1,0 +1,82 @@
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+<link rel="stylesheet" href="{{ 'component-featured-products.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript>{{ 'component-featured-products.css' | asset_url | stylesheet_tag }}</noscript>
+
+{% capture cart_items %}{% for item in cart.items %}{{ item.product_id }}|{% endfor %}{% endcapture %}
+{% assign cart_items = cart_items | split: '|' %}
+
+<div class="isolate">
+    <div class="featured-products section-{{ section.id }}">
+        {%- if section.settings.title != blank -%}
+            <h2 class="featured-products__title">{{ section.settings.title | escape }}</h2>
+        {%- endif -%}
+
+        <ul class="featured-products__products">
+            {%- for product in section.settings.collection.products -%}
+                {% assign product_id = product.id | append: "" %}
+                {% unless cart_items contains product_id %}
+                    <li class="featured-products__product">
+                        {% render 'card-product',
+                                card_product: product,
+                                media_aspect_ratio: section.settings.image_ratio,
+                                show_secondary_image: section.settings.show_secondary_image,
+                                show_vendor: section.settings.show_vendor,
+                                show_rating: section.settings.show_rating,
+                                show_quick_add: section.settings.enable_quick_add,
+                                section_id: section.id
+                        %}
+                    </li>
+                {% endunless %}
+            {% endfor %}
+            {%- for product in section.settings.products -%}
+                {% assign product_id = product.id | append: "" %}
+                {% unless cart_items contains product_id %}
+                    <li class="featured-products__product">
+                        {% render 'card-product',
+                                card_product: product,
+                                media_aspect_ratio: section.settings.image_ratio,
+                                show_secondary_image: section.settings.show_secondary_image,
+                                show_vendor: section.settings.show_vendor,
+                                show_rating: section.settings.show_rating,
+                                show_quick_add: section.settings.enable_quick_add,
+                                section_id: section.id
+                        %}
+                    </li>
+                {% endunless %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% schema %}
+{
+    "name": "t:sections.featured-products.name",
+    "tag": "section",
+    "class": "section",
+    "settings": [
+        {
+            "type": "text",
+            "id": "title",
+            "default": "Featured products",
+            "label": "t:sections.featured-products.settings.title.label"
+        },
+        {
+            "type": "collection",
+            "id": "collection",
+            "label": "t:sections.featured-products.settings.collection.label"
+        },
+        {
+            "type": "product_list",
+            "id": "products",
+            "label": "t:sections.featured-products.settings.products.label"
+        }
+    ],
+    "presets": [
+        {
+            "name": "t:sections.featured-products.presets.name"
+        }
+    ]
+}
+{% endschema %}

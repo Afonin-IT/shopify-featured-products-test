@@ -744,6 +744,23 @@
         "name": "Featured collection"
       }
     },
+    "featured-products": {
+      "name": "Featured products",
+      "settings": {
+        "title": {
+          "label": "Heading"
+        },
+        "collection": {
+          "label": "Collection"
+        },
+        "products": {
+          "label": "Additional products"
+        }
+      },
+      "presets": {
+        "name": "Featured products"
+      }
+    },
     "featured-product": {
       "name": "Featured product",
       "blocks": {
