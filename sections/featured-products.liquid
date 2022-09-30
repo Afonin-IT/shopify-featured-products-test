@@ -1,8 +1,9 @@
-{{ 'component-card.css' | asset_url | stylesheet_tag }}
-{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-alternative-card-product.css' | asset_url | stylesheet_tag }}
 
 <link rel="stylesheet" href="{{ 'component-featured-products.css' | asset_url }}" media="print" onload="this.media='all'">
 <noscript>{{ 'component-featured-products.css' | asset_url | stylesheet_tag }}</noscript>
+
+<script src="{{ 'alternative-card-product.js' | asset_url }}" defer="defer"></script>
 
 {% capture cart_items %}{% for item in cart.items %}{{ item.product_id }}|{% endfor %}{% endcapture %}
 {% assign cart_items = cart_items | split: '|' %}
@@ -18,15 +19,7 @@
                 {% assign product_id = product.id | append: "" %}
                 {% unless cart_items contains product_id %}
                     <li class="featured-products__product">
-                        {% render 'card-product',
-                                card_product: product,
-                                media_aspect_ratio: section.settings.image_ratio,
-                                show_secondary_image: section.settings.show_secondary_image,
-                                show_vendor: section.settings.show_vendor,
-                                show_rating: section.settings.show_rating,
-                                show_quick_add: section.settings.enable_quick_add,
-                                section_id: section.id
-                        %}
+                        {% render 'alternative-card-product', card_product: product %}
                     </li>
                 {% endunless %}
             {% endfor %}
@@ -34,15 +27,7 @@
                 {% assign product_id = product.id | append: "" %}
                 {% unless cart_items contains product_id %}
                     <li class="featured-products__product">
-                        {% render 'card-product',
-                                card_product: product,
-                                media_aspect_ratio: section.settings.image_ratio,
-                                show_secondary_image: section.settings.show_secondary_image,
-                                show_vendor: section.settings.show_vendor,
-                                show_rating: section.settings.show_rating,
-                                show_quick_add: section.settings.enable_quick_add,
-                                section_id: section.id
-                        %}
+                        {% render 'alternative-card-product', card_product: product %}
                     </li>
                 {% endunless %}
             {% endfor %}

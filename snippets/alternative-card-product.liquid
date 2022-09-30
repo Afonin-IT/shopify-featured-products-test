@@ -1,0 +1,104 @@
+{% comment %}
+  Renders a alternative product card
+
+  Accepts:
+  - card_product: {Object} Product Liquid object (optional)
+{% endcomment %}
+
+{%- liquid
+    assign variants = card_product.variants
+    
+    if variants.size > 1
+        assign media = card_product.selected_or_first_available_variant.featured_media
+    else
+        assign media = card_product.featured_media
+    endif
+
+    assign discount = card_product.variants[0].compare_at_price | minus: card_product.variants[0].price | times: 100.0 | divided_by: card_product.variants[0].compare_at_price | money_without_currency | times: 100 | remove: '.0'
+
+    assign currency_symbol = shop.money_format | split: '{' | first
+-%}
+
+
+{%- if card_product and card_product != empty -%}
+    <alternative-card-product>
+        <script type="application/json">
+            {{ variants | json }}
+        </script>
+        <div class="alternative-card-product">
+            <div class="alternative-card-product__image">
+                <a href="{{ card_product.url }}">
+                    <img src="{{ media | image_url}}" alt="{{ media.alt | escape }}">
+                </a>
+            </div>
+            <a href="{{ card_product.url }}">
+                <h3 class="alternative-card-product__title">{{ card_product.title | escape }}</h3>
+            </a>
+            <div class="alternative-card-product__info">
+                {% if variants.size > 1 %}
+                    <div class="alternative-card-product__variants-selector">
+                        <select>
+                            {% for variant in variants %}
+                                <option value="{{ variant.id }}">{{ variant.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <svg class="arrow" width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 0.433016C12 0.322172 11.9544 0.211328 11.8633 0.126834C11.6812 -0.0422779 11.3856 -0.0422779 11.2035 0.126834L5.99997 4.95462L0.796605 0.126834C0.614337 -0.0422779 0.318868 -0.0422779 0.136601 0.126834C-0.0455336 0.295945 -0.0455336 0.570087 0.136601 0.739199L5.66997 5.87317C5.8521 6.04228 6.1477 6.04228 6.32984 5.87317L11.8632 0.739199C11.9544 0.654705 12 0.54386 12 0.433016Z" fill="#464B90"/>
+                        </svg>
+                    </div>
+                {% endif %}
+                {% if card_product.compare_at_price_max > 0 and card_product.compare_at_price_max > card_product.price %}
+                    <div class="alternative-card-product__discount">
+                        -<span>{{ discount }}</span>%
+                    </div>
+                {% endif %}
+            </div>
+            <div class="alternative-card-product__quick-add no-js-hidden">
+                {%- assign product_form_id = 'quick-add-' | append: section_id | append: card_product.id -%}
+                {%- form 'product', card_product, id: product_form_id, class: 'form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                    <input
+                            type="hidden"
+                            name="id"
+                            value="{{ card_product.selected_or_first_available_variant.id }}"
+                            disabled
+                    >
+                    <button
+                            id="{{ product_form_id }}-submit"
+                            type="submit"
+                            name="add"
+                            class="alternative-card-product__quick-add-submit"
+                            aria-haspopup="dialog"
+                            aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ card_product.id }}"
+                            aria-live="polite"
+                            data-sold-out-message="true"
+                            {% if card_product.selected_or_first_available_variant.available == false %}
+                                disabled
+                            {% endif %}
+                    >
+                            <span>
+                              {%- if card_product.selected_or_first_available_variant.available -%}
+                                  {{ 'products.product.add_to_cart' | t }} - {{ currency_symbol }}<span class="alternative-card-product__price">{{ card_product.price | money_without_currency }}</span>
+                              {%- else -%}
+                                  {{ 'products.product.sold_out' | t }}
+                              {%- endif -%}
+                            </span>
+                            <span class="sold-out-message hidden">
+                              {{ 'products.product.sold_out' | t }}
+                            </span>
+                        <div class="loading-overlay__spinner hidden">
+                            <svg
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    class="spinner"
+                                    viewBox="0 0 66 66"
+                                    xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                            </svg>
+                        </div>
+                    </button>
+                {%- endform -%}
+            </div>
+        </div>
+    </alternative-card-product>
+{% endif %}
